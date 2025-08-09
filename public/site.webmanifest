@@ -1,0 +1,12 @@
+
+{
+    "name": "CryptoCalc",
+    "short_name": "CryptoCalc",
+    "description": "Professional tools for cryptocurrency traders.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "icons": [
+    ]
+}
