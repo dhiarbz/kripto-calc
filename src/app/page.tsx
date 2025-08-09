@@ -2,8 +2,8 @@
 import React from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Tools from "@/components/Tools";
-// import NewsSection from "@/components/NewsSection";
+import Market from "@/components/Market";
+import ToolsSection from "@/components/Tools";
 import Footer from "@/components/Footer";
 
 const Page = () => {
@@ -11,7 +11,8 @@ const Page = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <Tools />
+      <Market />
+      <ToolsSection />
       <Footer />
     </div>
   );

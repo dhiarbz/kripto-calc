@@ -8,7 +8,7 @@ const Footer = () => {
     // Nama variabel didefinisikan sebagai 'footerlinks' (l kecil)
     const footerlinks = {
         "Tools" : [
-            { name: "Crypto Converter", href: "/converter" },
+            { name: "Crypto to Rupiah Converter", href: "/converter" },
             { name: "Position Size Calculator", href: "/position-size" },
             { name: "Gain & Loss Calculator", href: "/gain-loss" },
             { name: "ROI Mining Calculator", href: "/roi-mining" }

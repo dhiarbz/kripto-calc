@@ -23,7 +23,7 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
                 Master Your
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400"> Crypto Trading</span>
+                <span className="bg-primary bg-clip-text text-transparent"> Crypto Trading</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
                 Comprehensive tools for cryptocurrency traders. Calculate positions, analyze risks, 
@@ -51,7 +51,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold shadow-glow animate-glow-pulse"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-glow"
               >
                 Start Calculating
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -66,7 +66,7 @@ const Hero = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
+            {/* <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-bold text-foreground">10K+</div>
                 <div className="text-sm text-muted-foreground">Active Users</div>
@@ -79,13 +79,13 @@ const Hero = () => {
                 <div className="text-2xl md:text-3xl font-bold text-foreground">99.9%</div>
                 <div className="text-sm text-muted-foreground">Accuracy</div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Visual Element */}
           <div className="relative lg:block hidden">
             <div className="relative w-full h-96 animate-slide-up">
-              <div className="absolute inset-0 bg-gradient-card rounded-3xl shadow-card border border-border/50 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-card rounded-3xl shadow-card border border-border/50 backdrop-blur-sm">
                 <div className="p-8 space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-foreground">Live Trading Data</h3>
