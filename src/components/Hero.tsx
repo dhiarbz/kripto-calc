@@ -22,12 +22,12 @@ const Hero = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                Master Your
-                <span className="bg-primary bg-clip-text text-transparent"> Crypto Trading</span>
+                Trading Cerdas
+                <span className="bg-primary bg-clip-text text-transparent"> Cuan Maksimal</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-                Comprehensive tools for cryptocurrency traders. Calculate positions, analyze risks, 
-                and maximize your ROI with our professional trading calculators.
+                Hitung posisi ideal, analisis risiko pasar, dan tingkatkan potensi ROI Anda. 
+                Semua alat yang Anda butuhkan dalam satu platform.
               </p>
             </div>
 
@@ -35,15 +35,15 @@ const Hero = () => {
             <div className="flex flex-wrap gap-3">
               <div className="flex items-center space-x-2 bg-brand-accent/50 px-4 py-2 rounded-full">
                 <TrendingUp className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">ROI Calculator</span>
+                <span className="text-sm font-medium">Kalkulator ROI</span>
               </div>
               <div className="flex items-center space-x-2 bg-brand-accent/50 px-4 py-2 rounded-full">
                 <Shield className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Risk Management</span>
+                <span className="text-sm font-medium">Manajemen Resiko</span>
               </div>
               <div className="flex items-center space-x-2 bg-brand-accent/50 px-4 py-2 rounded-full">
                 <Zap className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Instant Results</span>
+                <span className="text-sm font-medium">Hasil Instan</span>
               </div>
             </div>
 
@@ -53,7 +53,7 @@ const Hero = () => {
                 size="lg" 
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-glow"
               >
-                Start Calculating
+                Coba Kalkulator
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button 
@@ -61,7 +61,7 @@ const Hero = () => {
                 variant="outline" 
                 className="border-primary/30 text-foreground hover:bg-accent"
               >
-                Watch Demo
+                Lihat Demo
               </Button>
             </div>
 
@@ -88,7 +88,7 @@ const Hero = () => {
               <div className="absolute inset-0 bg-card rounded-3xl shadow-card border border-border/50 backdrop-blur-sm">
                 <div className="p-8 space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-foreground">Live Trading Data</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Harga Pasar Terkini</h3>
                     <div className="w-3 h-3 bg-primary rounded-full animate-bounce-gentle"></div>
                   </div>
                   
@@ -102,7 +102,7 @@ const Hero = () => {
                       <span className="text-lg font-bold text-foreground">58,920,000</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                      <span className="text-muted-foreground">Portfolio Value</span>
+                      <span className="text-muted-foreground">Jumlah Volume</span>
                       <span className="text-lg font-bold text-primary">+15.2%</span>
                     </div>
                   </div>

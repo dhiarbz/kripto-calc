@@ -1,5 +1,7 @@
 "use client";
-import { Calculator, Mail, Phone, MapPin } from "lucide-react";
+import { Calculator, Twitter, Send, MessageSquare } from "lucide-react";
+import { FaTwitter, FaDiscord, FaTelegramPlane } from "react-icons/fa";
+
 import Link from "next/link"; // SARAN: Impor Link untuk navigasi
 
 const Footer = () => {
@@ -7,23 +9,22 @@ const Footer = () => {
 
     // Nama variabel didefinisikan sebagai 'footerlinks' (l kecil)
     const footerlinks = {
-        "Tools" : [
-            { name: "Crypto to Rupiah Converter", href: "/converter" },
-            { name: "Position Size Calculator", href: "/position-size" },
-            { name: "Gain & Loss Calculator", href: "/gain-loss" },
-            { name: "ROI Mining Calculator", href: "/roi-mining" }
+        "Produk" : [
+            { name: "Konverter Kripto ke Rupiah", href: "/converter" },
+            { name: "Kalkulator Ukuran Posisi (Position Size)", href: "/position-size" },
+            { name: "Kalkulator Keuntungan & Kerugian", href: "/gain-loss" },
+            { name: "Kalkulator DCA (Dollar-Cost Averaging)", href: "/dca" }
         ],
-        "Resources" : [
-            { name: "Trading Guide", href: "/guide" },
-            { name: "API Documentation", href: "/api" },
-            { name: "Blog", href: "/blog" },
-            { name: "FAQ", href: "/faq" }
+        "Donasi" : [
+            { name: "USDT", href: "/d-usdt" },
+            { name: "BTC", href: "/d-btc" },
+            { name: "ETH", href: "/d-eth" },
         ],
-        "Company" : [
-            { name: "About Us", href: "/about" },
-            { name: "Contact", href: "/contact" },
-            { name: "Privacy Policy", href: "/privacy" },
-            { name: "Terms of Service", href: "/terms" }
+        "Perusahaan" : [
+            { name: "Tentang Kami", href: "/about" },
+            { name: "Kontak", href: "/contact" },
+            { name: "Kebijakan Privasi", href: "/privacy" },
+            { name: "Ketentuan Layanan", href: "/terms" }
         ]
     };
 
@@ -38,24 +39,6 @@ const Footer = () => {
                                 <Calculator className="w-5 h-5 text-primary-foreground" />
                             </div>
                             <span className="text-xl font-bold text-foreground">CryptoCalc</span>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed">
-                            Your trusted partner for cryptocurrency trading calculations. 
-                            Make informed decisions with our professional-grade tools.
-                        </p>
-                        <div className="space-y-3">
-                            <div className="flex items-center space-x-3 text-muted-foreground">
-                                <Mail className="w-4 h-4" />
-                                <span>support@cryptocalc.id</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-muted-foreground">
-                                <Phone className="w-4 h-4" />
-                                <span>+62 21 1234 5678</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-muted-foreground">
-                                <MapPin className="w-4 h-4" />
-                                <span>Jakarta, Indonesia</span>
-                            </div>
                         </div>
                     </div>
 
@@ -87,17 +70,39 @@ const Footer = () => {
                         <p className="text-muted-foreground text-sm">
                             © {currentYear} CryptoCalc. All rights reserved.
                         </p>
-                        <div className="flex space-x-6">
-                            {/* SARAN: Gunakan komponen Link */}
-                            <Link href="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors duration-200">
-                                Privacy Policy
-                            </Link>
-                            <Link href="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors duration-200">
-                                Terms of Service
-                            </Link>
-                            <Link href="/cookies" className="text-muted-foreground hover:text-primary text-sm transition-colors duration-200">
-                                Cookie Policy
-                            </Link>
+                       <div className="flex space-x-6">
+                        {/* Link ke Twitter */}
+                        <Link 
+                            href="https://twitter.com/yourprofile"
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            aria-label="Twitter"
+                            className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                        >
+                            <FaTwitter className="w-5 h-5" />
+                        </Link>
+
+                        {/* Link ke Discord */}
+                        <Link 
+                            href="https://discord.gg/yourserver" 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Discord"
+                            className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                        >
+                            <FaDiscord className="w-5 h-5" />
+                        </Link>
+
+                        {/* Link ke Telegram */}
+                        <Link 
+                            href="https://t.me/yourchannel" // Ganti dengan URL Telegram Anda
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Telegram"
+                            className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                        >
+                            <FaTelegramPlane className="w-5 h-5" /> 
+                        </Link>
                         </div>
                     </div>
                 </div>

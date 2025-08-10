@@ -1,34 +1,38 @@
-"use client"; // Tambahkan ini jika Anda menggunakan Next.js App Router
-
+"use client";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu,DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Calculator, Menu, X, ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navItems = [
-        { name: "Home", href: "#home" },
-        { name: "Market", href: "#market" },
-        { name: "Tools", href: "#tools", subItems: [
-            {name: "Crypto to Rupiah Converter", href: "/converter"},
-            {name: "Position Size Calculator", href: "/position-size"},
-            {name: "Gain & Loss Calculator", href: "/gain-loss"},
-            {name: "ROI Mining Calculator", href: "/roi-mining"}
+        { name: "Produk", href: "#tools", subItems: [
+            {name: "Konverter Kripto ke Rupiah", href: "/converter"},
+            {name: "Kalkulator Ukuran Posisi", href: "/position-size"},
+            {name: "Kalkulator Keuntungan dan Kerugian", href: "/gain-loss"},
+            {name: "Kalkulator DCA", href: "/roi-mining"}
         ] },
+        { name: "Pasar", href: "/market" },
+        { name: "Kalender", href: "/calendar" },
     ];
 
     return (
        <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+          {/* Logo with prefetch */}
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2"
+            prefetch={true}
+          >
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Calculator className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">CryptoCalc</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -42,32 +46,37 @@ const Header = () => {
                   <DropdownMenuContent align="start" className="w-56 bg-background/95 backdrop-blur-sm border border-border">
                     {item.subItems.map((subItem) => (
                       <DropdownMenuItem key={subItem.name} asChild>
-                        <a 
+                        <Link 
                           href={subItem.href}
+                          prefetch={subItem.href === "/converter" ? true : false} // Prefetch critical pages
                           className="w-full cursor-pointer text-foreground hover:text-primary focus:text-primary"
+                          onClick={() => setIsMenuOpen(false)}
                         >
                           {subItem.name}
-                        </a>
+                        </Link>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={false} // Disable for less important pages
                   className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
                 >
                   {item.name}
-                </a>
+                </Link>
               )
             ))}
           </nav>
 
           {/* CTA Button */}
           <div className="hidden md:flex">
-            <Button className="bg-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold shadow-glow">
-              Get Started
+            <Button asChild>
+              <Link href="/get-started" prefetch={true}>
+                Coba Sekarang
+              </Link>
             </Button>
           </div>
 
@@ -86,31 +95,35 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <div key={item.name}>
-                  <a
+                  <Link
                     href={item.href}
+                    prefetch={false}
                     className="block text-foreground hover:text-primary transition-colors duration-200 font-medium px-2 py-1"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                   {item.subItems && (
                     <div className="pl-4 mt-2 space-y-2">
                       {item.subItems.map((subItem) => (
-                        <a
+                        <Link
                           key={subItem.name}
                           href={subItem.href}
+                          prefetch={false}
                           className="block text-muted-foreground hover:text-primary transition-colors duration-200 px-2 py-1 text-sm"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           {subItem.name}
-                        </a>
+                        </Link>
                       ))}
                     </div>
                   )}
                 </div>
               ))}
-              <Button className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold shadow-glow mt-4">
-                Get Started
+              <Button asChild className="mt-4">
+                <Link href="/get-started" prefetch={true}>
+                  Get Started
+                </Link>
               </Button>
             </nav>
           </div>

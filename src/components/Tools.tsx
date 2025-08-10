@@ -1,42 +1,42 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Calculator, TrendingUp, DollarSign, Pickaxe } from "lucide-react";
+import { ArrowRight, Calculator, TrendingUp, DollarSign, Pickaxe, CandlestickChart } from "lucide-react";
 
 const ToolsSection = () => {
   const tools = [
     {
       icon: DollarSign,
-      title: "Crypto to Rupiah Converter",
-      description: "Convert any cryptocurrency to Indonesian Rupiah with real-time exchange rates and historical data.",
-      features: ["Real-time rates", "Multiple coins", "Historical charts"],
+      title: "Konverter Kripto ke Rupiah",
+      description: "Konversi mata uang kripto apa pun ke Rupiah Indonesia dengan kurs real-time dan data historis.",
+      features: ["Kurs real-time", "Berbagai jenis koin", "Grafik historis"],
       href: "/converter",
       color: "text-blue-600"
     },
     {
       icon: Calculator,
-      title: "Position Size Calculator",
-      description: "Calculate optimal position sizes based on your risk tolerance and account balance for better risk management.",
-      features: ["Risk percentage", "Stop loss levels", "Account balance"],
+      title: "Kalkulator Ukuran Posisi (Position Size)",
+      description: "Hitung ukuran posisi trading yang optimal berdasarkan toleransi risiko dan saldo akun Anda untuk manajemen risiko yang lebih baik.",
+      features: ["Persentase risiko", "Level stop loss", "Saldo akun"],
       href: "/position-size",
       color: "text-purple-600"
     },
     {
       icon: TrendingUp,
-      title: "Gain & Loss Calculator",
-      description: "Analyze your trading performance with detailed profit/loss calculations and percentage returns.",
-      features: ["P&L analysis", "Percentage returns", "Fee calculations"],
+      title: "Kalkulator Keuntungan & Kerugian",
+      description: "Analisis performa trading Anda dengan perhitungan keuntungan/kerugian yang detail dan persentase imbal hasil.",
+      features: ["Analisis P&L", "Persentase imbal hasil", "Perhitungan biaya"],
       href: "/gain-loss",
       color: "text-emerald-600"
     },
     {
-      icon: Pickaxe,
-      title: "ROI Mining & Staking",
-      description: "Calculate returns on investment for mining operations and staking rewards with compound interest.",
-      features: ["Mining profitability", "Staking rewards", "Compound interest"],
-      href: "/roi-mining",
-      color: "text-orange-600"
-    }
+      icon: CandlestickChart, 
+      title: "Kalkulator DCA (Dollar-Cost Averaging)",
+      description: "Simulasikan hasil investasi rutin Anda dan lihat bagaimana harga beli rata-rata terbentuk seiring waktu untuk mengoptimalkan strategi cicil aset.",
+      features: ["Jumlah investasi per periode", "Interval waktu", "Total durasi investasi"],
+      href: "/dca-calculator",
+      color: "text-blue-600"
+    },
   ];
 
   return (
@@ -45,12 +45,12 @@ const ToolsSection = () => {
         {/* Header */}
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-            Crypto Risk & ROI Tools
+            Alat Kalkulator Trading
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Professional-grade calculators designed for serious crypto traders and investors. 
-            Make informed decisions with accurate calculations and real-time data.
-          </p>
+           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+              Kalkulator tingkat profesional yang dirancang untuk trader dan investor kripto yang serius. 
+              Buat keputusan berdasarkan informasi dengan perhitungan yang akurat dan data real-time.
+           </p>
         </div>
 
         {/* Tools Grid */}
@@ -60,7 +60,7 @@ const ToolsSection = () => {
             return (
               <Card 
                 key={tool.title}
-                className="group hover:shadow-glow transition-all duration-300 transform hover:-translate-y-2 bg-gradient-card border-border/50 animate-fade-in"
+                className="group hover:shadow-glow transition-all duration-300 transform hover:-translate-y-2 bg-card border-border/50 animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardHeader className="space-y-4">
@@ -82,7 +82,7 @@ const ToolsSection = () => {
                 <CardContent className="space-y-6">
                   {/* Features */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Key Features</h4>
+                    <h4 className="text-sm font-semibold text-foreground tracking-wide">Fitur Utama</h4>
                     <div className="flex flex-wrap gap-2">
                       {tool.features.map((feature) => (
                         <span 
@@ -97,10 +97,10 @@ const ToolsSection = () => {
 
                   {/* CTA Button */}
                   <Button 
-                    className="w-full bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold group-hover:shadow-glow transition-all duration-300"
+                    className="w-full bg-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold group-hover:shadow-glow transition-all duration-300"
                     onClick={() => window.location.href = tool.href}
                   >
-                    Use Calculator
+                    Coba Kalkulator
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -110,7 +110,7 @@ const ToolsSection = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16">
+        {/* <div className="text-center mt-16">
           <div className="bg-gradient-card p-8 rounded-3xl border border-border/50 shadow-card max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-foreground mb-4">
               Need More Advanced Tools?
@@ -126,7 +126,7 @@ const ToolsSection = () => {
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
