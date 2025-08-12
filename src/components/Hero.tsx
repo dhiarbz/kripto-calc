@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Shield, Zap } from "lucide-react";
-import heroImage from "@/assets/hero-trading.jpg";
 
 const Hero = () => {
     return (
@@ -9,7 +8,7 @@ const Hero = () => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={heroImage.src} 
+          src="/assets/hero-trading.jpg" 
           alt="Trading Background" 
           className="w-full h-full object-cover opacity-10"
         />

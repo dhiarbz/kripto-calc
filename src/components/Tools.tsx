@@ -1,7 +1,9 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Calculator, TrendingUp, DollarSign, Pickaxe, CandlestickChart } from "lucide-react";
+import { ArrowRight, Calculator, TrendingUp, DollarSign, CandlestickChart } from "lucide-react";
+import Link from "next/link"; // 1. Impor komponen Link
 
 const ToolsSection = () => {
   const tools = [
@@ -48,8 +50,8 @@ const ToolsSection = () => {
             Alat Kalkulator Trading
           </h2>
            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Kalkulator tingkat profesional yang dirancang untuk trader dan investor kripto yang serius. 
-              Buat keputusan berdasarkan informasi dengan perhitungan yang akurat dan data real-time.
+             Kalkulator tingkat profesional yang dirancang untuk trader dan investor kripto yang serius. 
+             Buat keputusan berdasarkan informasi dengan perhitungan yang akurat dan data real-time.
            </p>
         </div>
 
@@ -60,7 +62,7 @@ const ToolsSection = () => {
             return (
               <Card 
                 key={tool.title}
-                className="group hover:shadow-glow transition-all duration-300 transform hover:-translate-y-2 bg-card border-border/50 animate-fade-in"
+                className="group hover:shadow-glow transition-all duration-300 transform hover:-translate-y-2 bg-card border-border/50 animate-fade-in flex flex-col"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardHeader className="space-y-4">
@@ -79,9 +81,9 @@ const ToolsSection = () => {
                   </CardDescription>
                 </CardHeader>
                 
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 flex flex-col flex-grow mt-auto pt-0">
                   {/* Features */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex-grow">
                     <h4 className="text-sm font-semibold text-foreground tracking-wide">Fitur Utama</h4>
                     <div className="flex flex-wrap gap-2">
                       {tool.features.map((feature) => (
@@ -96,37 +98,23 @@ const ToolsSection = () => {
                   </div>
 
                   {/* CTA Button */}
-                  <Button 
-                    className="w-full bg-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold group-hover:shadow-glow transition-all duration-300"
-                    onClick={() => window.location.href = tool.href}
-                  >
-                    Coba Kalkulator
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
+                  {/* 2. Bungkus Button dengan Link dan tambahkan prop asChild */}
+                  <Link href={tool.href} legacyBehavior passHref>
+                    <Button 
+                      asChild
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold group-hover:shadow-glow transition-all duration-300 mt-4"
+                    >
+                      <a>
+                        Coba Kalkulator
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      </a>
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             );
           })}
         </div>
-
-        {/* Bottom CTA */}
-        {/* <div className="text-center mt-16">
-          <div className="bg-gradient-card p-8 rounded-3xl border border-border/50 shadow-card max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
-              Need More Advanced Tools?
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Get access to premium features, advanced analytics, and personalized trading insights.
-            </p>
-            <Button 
-              size="lg"
-              className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground font-semibold shadow-glow"
-            >
-              Upgrade to Pro
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-        </div> */}
       </div>
     </section>
   );
