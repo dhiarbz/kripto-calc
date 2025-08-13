@@ -37,7 +37,7 @@ const fetchMarketData = async (category?: string) => {
     const params: any = {
         vs_currency: "idr",
         order: "market_cap_desc",
-        per_page: 100,
+        per_page: 50,
         page: 1,
         sparkline: false,
         price_change_percentage: "24h",
@@ -52,7 +52,7 @@ const fetchMarketData = async (category?: string) => {
     return response.data as MarketData[];
 }
 
-const Market = () => {
+const MarketTools = () => {
     const [sortBy, setSortBy] = useState<keyof MarketData>("market_cap");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -67,7 +67,7 @@ const Market = () => {
     const {
         data: marketData,
         isLoading,
-        isError, // Ganti 'error' menjadi 'isError' agar lebih konsisten
+        isError, 
         refetch
     } = useQuery({
         queryKey: ["marketData", selectedCategory],
@@ -157,6 +157,29 @@ const Market = () => {
                 {/* ... Filters Section ... */}
                 <div className="mb-8 space-y-4">
                     {/* ... Tombol Filter & Refresh ... */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowFilter(!showFilter)}
+                                className="flex items-center gap-2"
+                            >
+                                <Filter className="h-4 w-4" />
+                                Filter Kategori
+                            </Button>
+                            {selectedCategory !== "all" && (
+                                <Button variant="ghost" size="sm" onClick={clearFilter} className="flex items-center gap-1">
+                                <X className="h-3 w-3" />
+                                Clear
+                                </Button>
+                            )}
+                            </div>
+                            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isLoading}>
+                            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                            Refresh
+                            </Button>
+                        </div>
 
                     {/* Popular Categories */}
                     <div className="flex flex-wrap gap-2">
@@ -174,6 +197,40 @@ const Market = () => {
                         ))}
                     </div>
                     {/* ... sisa filter ... */}
+                        {showFilter && (
+                            <Card className="p-4">
+                            <div className="space-y-4">
+                                <h3 className="font-semibold">Filter Lanjutan</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm font-medium mb-2 block">Pilih Kategori</label>
+                                    <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih kategori..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Semua Kategori</SelectItem>
+                                        {categories?.map((category) => (
+                                        <SelectItem key={category.category_id} value={category.category_id}>
+                                            {category.name}
+                                        </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                    </Select>
+                                </div>
+                                </div>
+                            </div>
+                        </Card>
+                        )}
+                    {/* Active Filter Display */}
+                        {selectedCategory !== "all" && (
+                            <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Filter aktif:</span>
+                            <Badge variant="outline" className="bg-[#C9FD35]/10 border-[#C9FD35]">
+                                {categories?.find((c) => c.category_id === selectedCategory)?.name || selectedCategory}
+                            </Badge>
+                            </div>
+                        )}
                 </div>
 
                 {/* Market Data Table */}
@@ -182,7 +239,56 @@ const Market = () => {
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                {/* ... thead ... */}
+                                <thead className="bg-muted/50">
+                                    <tr>
+                                        <th className="text-left p-4 font-semibold">#</th>
+                                        <th className="text-left p-4 font-semibold">Nama</th>
+                                        <th className="text-right p-4 font-semibold">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleSort("current_price")}
+                                            className="h-auto p-0 font-semibold"
+                                        >
+                                            Harga
+                                            <ArrowUpDown className="ml-1 h-3 w-3" />
+                                        </Button>
+                                        </th>
+                                        <th className="text-right p-4 font-semibold">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleSort("price_change_percentage_24h")}
+                                            className="h-auto p-0 font-semibold"
+                                        >
+                                            24h %
+                                            <ArrowUpDown className="ml-1 h-3 w-3" />
+                                        </Button>
+                                        </th>
+                                        <th className="text-right p-4 font-semibold hidden md:table-cell">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleSort("market_cap")}
+                                            className="h-auto p-0 font-semibold"
+                                        >
+                                            Market Cap
+                                            <ArrowUpDown className="ml-1 h-3 w-3" />
+                                        </Button>
+                                        </th>
+                                        <th className="text-right p-4 font-semibold hidden lg:table-cell">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleSort("total_volume")}
+                                            className="h-auto p-0 font-semibold"
+                                        >
+                                            Volume 24h
+                                            <ArrowUpDown className="ml-1 h-3 w-3" />
+                                        </Button>
+                                        </th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {isLoading ? (
                                         <tr>
@@ -191,7 +297,6 @@ const Market = () => {
                                                 <p className="text-muted-foreground">Memuat data...</p>
                                             </td>
                                         </tr>
-                                    // 2. PERBAIKAN: Gunakan 'sortedMarketData' bukan 'sortBy'
                                     ) : sortedMarketData.length > 0 ? (
                                         sortedMarketData.map((coin, index) => (
                                             <tr key={coin.id} className="border-b hover:bg-muted/30 transition-colors">
@@ -252,7 +357,6 @@ const Market = () => {
                 </Card>
 
                 {/* Market Summary */}
-                {/* 3. PERBAIKAN: Gunakan 'sortedMarketData' bukan 'sortBy' */}
                 {sortedMarketData.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                         <Card>
@@ -312,4 +416,4 @@ const Market = () => {
     );
 };
 
-export default Market;
+export default MarketTools;
