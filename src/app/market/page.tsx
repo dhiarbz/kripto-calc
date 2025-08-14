@@ -8,7 +8,9 @@ import { ArrowUpDown, Loader2, TrendingUp, TrendingDown, RefreshCw, Filter, X } 
 import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import Image from "next/image"; // 1. TAMBAHKAN: Impor komponen Image
+import Image from "next/image"; 
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface MarketData {
     id: string;
@@ -37,7 +39,7 @@ const fetchMarketData = async (category?: string) => {
     const params: any = {
         vs_currency: "idr",
         order: "market_cap_desc",
-        per_page: 50,
+        per_page: 25,
         page: 1,
         sparkline: false,
         price_change_percentage: "24h",
@@ -52,23 +54,43 @@ const fetchMarketData = async (category?: string) => {
     return response.data as MarketData[];
 }
 
+const TableRowSkeleton = () => (
+    <tr className="border-b">
+        <td className="p-4"><div className="h-4 w-4 bg-muted rounded animate-pulse"></div></td>
+        <td className="p-4">
+            <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-muted rounded-full animate-pulse"></div>
+                <div>
+                    <div className="h-4 w-24 bg-muted rounded animate-pulse mb-1"></div>
+                    <div className="h-3 w-12 bg-muted rounded animate-pulse"></div>
+                </div>
+            </div>
+        </td>
+        <td className="p-4 text-right"><div className="h-4 w-20 bg-muted rounded animate-pulse ml-auto"></div></td>
+        <td className="p-4 text-right"><div className="h-4 w-12 bg-muted rounded animate-pulse ml-auto"></div></td>
+        <td className="p-4 text-right hidden md:table-cell"><div className="h-4 w-28 bg-muted rounded animate-pulse ml-auto"></div></td>
+        <td className="p-4 text-right hidden lg:table-cell"><div className="h-4 w-24 bg-muted rounded animate-pulse ml-auto"></div></td>
+    </tr>
+);
+
 const MarketTools = () => {
     const [sortBy, setSortBy] = useState<keyof MarketData>("market_cap");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [showFilter, setShowFilter] = useState(false);
 
-    const { data: categories, isLoading: categoriesLoading } = useQuery({
+   const { data: categories } = useQuery({
         queryKey: ["categories"],
         queryFn: fetchCategories,
-        staleTime: 5 * 60 * 1000,
-    })
+        staleTime: Infinity, 
+    });
 
-    const {
+     const {
         data: marketData,
         isLoading,
         isError, 
-        refetch
+        refetch,
+        isFetching, // Gunakan isFetching untuk indikator refresh
     } = useQuery({
         queryKey: ["marketData", selectedCategory],
         queryFn: () => fetchMarketData(selectedCategory),
@@ -85,7 +107,8 @@ const MarketTools = () => {
 
     const sortedMarketData = useMemo(() => {
         if (!marketData) return [];
-        return [...marketData].sort((a, b) => {
+        const dataToSort = [...marketData];
+        dataToSort.sort((a, b) => {
             const aValue = a[sortBy];
             const bValue = b[sortBy];
             if (typeof aValue === "number" && typeof bValue === "number") {
@@ -96,6 +119,7 @@ const MarketTools = () => {
             }
             return 0;
         });
+        return dataToSort;
     }, [marketData, sortBy, sortOrder]);
 
     const handleSort = (value: keyof MarketData) => {
@@ -107,7 +131,8 @@ const MarketTools = () => {
         }
     };
 
-    const formatCurrency = (value: number) => {
+      const formatCurrency = (value: number | undefined) => {
+        if (value === undefined) return "N/A";
         return new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
@@ -139,12 +164,19 @@ const MarketTools = () => {
         { id: "layer-1", name: "Layer 1" },
         { id: "meme-token", name: "Meme" },
         { id: "gaming", name: "Gaming" },
-        { id: "non-fungible-tokens-nft", name: "NFT" }, // ID NFT yang benar
+        { id: "non-fungible-tokens-nft", name: "NFT" }, 
         { id: "metaverse", name: "Metaverse" },
     ];
 
+     const activeCategoryName = useMemo(() => {
+        if (selectedCategory === 'all') return 'Semua';
+        return popularCategories.find(c => c.id === selectedCategory)?.name || categories?.find(c => c.category_id === selectedCategory)?.name || selectedCategory;
+    }, [selectedCategory, categories, popularCategories]);
+
     return (
-        <section id="market" className="py-16 bg-background">
+        <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main id="market" className="py-16 flex-grow">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 {/* ... Header Section ... */}
                 <div className="text-center mb-16 space-y-4">
@@ -175,8 +207,8 @@ const MarketTools = () => {
                                 </Button>
                             )}
                             </div>
-                            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isLoading}>
-                            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isFetching}>
+                            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
                             Refresh
                             </Button>
                         </div>
@@ -291,63 +323,61 @@ const MarketTools = () => {
                                 </thead>
                                 <tbody>
                                     {isLoading ? (
-                                        <tr>
-                                            <td colSpan={6} className="text-center p-8">
-                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                                                <p className="text-muted-foreground">Memuat data...</p>
+                                        // Kondisi 1: Menampilkan skeleton loading saat data pertama kali dimuat
+                                        Array.from({ length: 10 }).map((_, i) => <TableRowSkeleton key={i} />)
+                                    ) : sortedMarketData.length > 0 ? (
+                                        // Kondisi 2: Menampilkan data jika ada
+                                        sortedMarketData.map((coin, index) => (
+                                        <tr key={coin.id} className="border-b hover:bg-muted/30 transition-colors">
+                                            <td className="p-4 text-muted-foreground font-medium">{index + 1}</td>
+                                            <td className="p-4">
+                                            <div className="flex items-center space-x-3">
+                                                <Image
+                                                src={coin.image || "/placeholder.svg"}
+                                                alt={coin.name}
+                                                width={32}
+                                                height={32}
+                                                className="rounded-full"
+                                                />
+                                                <div>
+                                                <div className="font-semibold text-foreground">{coin.name}</div>
+                                                <div className="text-sm text-muted-foreground uppercase">{coin.symbol}</div>
+                                                </div>
+                                            </div>
+                                            </td>
+                                            <td className="p-4 text-right font-semibold">{formatCurrency(coin.current_price)}</td>
+                                            <td className="p-4 text-right">
+                                            <div className={`flex items-center justify-end space-x-1 ${
+                                                coin.price_change_percentage_24h >= 0 ? "text-green-600" : "text-red-600"
+                                            }`}>
+                                                {coin.price_change_percentage_24h >= 0 ? (
+                                                <TrendingUp className="h-3 w-3" />
+                                                ) : (
+                                                <TrendingDown className="h-3 w-3" />
+                                                )}
+                                                <span className="font-semibold">
+                                                {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
+                                                </span>
+                                            </div>
+                                            </td>
+                                            <td className="p-4 text-right font-medium hidden md:table-cell">
+                                            {formatCurrency(coin.market_cap)}
+                                            </td>
+                                            <td className="p-4 text-right font-medium hidden lg:table-cell">
+                                            {formatCurrency(coin.total_volume)}
                                             </td>
                                         </tr>
-                                    ) : sortedMarketData.length > 0 ? (
-                                        sortedMarketData.map((coin, index) => (
-                                            <tr key={coin.id} className="border-b hover:bg-muted/30 transition-colors">
-                                                <td className="p-4 text-muted-foreground font-medium">{index + 1}</td>
-                                                <td className="p-4">
-                                                    <div className="flex items-center space-x-3">
-                                                        <Image
-                                                            src={coin.image || "/placeholder.svg"}
-                                                            alt={coin.name}
-                                                            width={32}
-                                                            height={32}
-                                                            className="rounded-full"
-                                                        />
-                                                        <div>
-                                                            <div className="font-semibold text-foreground">{coin.name}</div>
-                                                            <div className="text-sm text-muted-foreground uppercase">{coin.symbol}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 text-right font-semibold">{formatCurrency(coin.current_price)}</td>
-                                                <td className="p-4 text-right">
-                                                    <div className={`flex items-center justify-end space-x-1 ${
-                                                        coin.price_change_percentage_24h >= 0 ? "text-green-600" : "text-red-600"
-                                                    }`}>
-                                                        {coin.price_change_percentage_24h >= 0 ? (
-                                                            <TrendingUp className="h-3 w-3" />
-                                                        ) : (
-                                                            <TrendingDown className="h-3 w-3" />
-                                                        )}
-                                                        <span className="font-semibold">
-                                                            {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 text-right font-medium hidden md:table-cell">
-                                                    {formatCurrency(coin.market_cap)}
-                                                </td>
-                                                <td className="p-4 text-right font-medium hidden lg:table-cell">
-                                                    {formatCurrency(coin.total_volume)}
-                                                </td>
-                                            </tr>
                                         ))
                                     ) : (
+                                        // Kondisi 3: Menampilkan pesan jika tidak ada data
                                         <tr>
-                                            <td colSpan={6} className="text-center p-8">
-                                                <p className="text-muted-foreground">
-                                                    {selectedCategory === "all"
-                                                        ? "Tidak ada data tersedia"
-                                                        : "Tidak ada token dalam kategori ini"}
-                                                </p>
-                                            </td>
+                                        <td colSpan={6} className="text-center p-8">
+                                            <p className="text-muted-foreground">
+                                            {selectedCategory === "all"
+                                                ? "Tidak ada data tersedia"
+                                                : "Tidak ada token dalam kategori ini"}
+                                            </p>
+                                        </td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -412,7 +442,9 @@ const MarketTools = () => {
                     </div>
                 )}
             </div>
-        </section>
+        </main>
+            <Footer />
+        </div>
     );
 };
 

@@ -1,8 +1,58 @@
 "use client";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Shield, Zap } from "lucide-react";
+import { ArrowRight, TrendingUp, Shield, Zap, Loader2 } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+
+interface CryptoData{
+  id: string;
+  symbol: string;
+  current_price: number;
+  market_cap: number;
+}
+
+const fetchCryptoData = async (): Promise<CryptoData[]> => {
+  const { data } = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
+    params: {
+      vs_currency: "idr",
+      ids: "bitcoin,ethereum", 
+      order: "market_cap_desc",
+      per_page: 2,
+      page: 1,
+      sparkline: false,
+    },
+  });
+  return data;
+};
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(value);
+};
 
 const Hero = () => {
+  const { data: cryptoData, isLoading, isError } = useQuery<CryptoData[]>({
+    queryKey: ["HerocryptoData"],
+    queryFn: fetchCryptoData,
+    staleTime: 60 * 1000 , 
+    refetchInterval: 60 * 1000,
+  });
+
+  useEffect(() => {
+    if(isError){
+    toast.error("Gagal memuat harga pasar");
+  }
+  }, [isError]);
+
+    const totalMarketCap = cryptoData?.reduce((acc, coin) => acc + coin.market_cap, 0) || 0;
+
+
     return (
          <section id="home" className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
       {/* Background Image */}
@@ -92,24 +142,32 @@ const Hero = () => {
                   </div>
                   
                   <div className="space-y-4">
+                    {isLoading ? (
                     <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                      <span className="text-muted-foreground">BTC/IDR</span>
-                      <span className="text-lg font-bold text-foreground">1,458,750,000</span>
+                      <Loader2 className="w-5 h-5 animate-spin text-primary" />
                     </div>
+                    ) : isError || !cryptoData ? (
+                      <div className="text-red-500">Gagal memuat data</div>
+                    ) : (
+                      <>
+                      {cryptoData?.map((crypto) => (
+                        <div key={crypto.id} className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
+                          <span className="text-muted-foreground">{crypto.symbol.toUpperCase()}/IDR</span>
+                          <span className="text-lg font-bold text-foreground">{formatCurrency(crypto.current_price)}</span>
+                        </div>
+                      ))}
                     <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                      <span className="text-muted-foreground">ETH/IDR</span>
-                      <span className="text-lg font-bold text-foreground">58,920,000</span>
+                      <span className="text-muted-foreground">Kapitalisasi Pasar</span>
+                      <span className="text-lg font-bold text-primary">{formatCurrency(totalMarketCap || 0)}</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                      <span className="text-muted-foreground">Jumlah Volume</span>
-                      <span className="text-lg font-bold text-primary">+15.2%</span>
-                    </div>
-                  </div>
-                </div>
+                      </>
+                    )}
               </div>
             </div>
           </div>
         </div>
+      </div>
+      </div>
       </div>
     </section>
     );
