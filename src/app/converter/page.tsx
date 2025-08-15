@@ -39,6 +39,7 @@ const fetchCurrencies = async (): Promise<CurrencyData[]> => {
   );
   return data;
 };
+
 function formatTimeAgo(timestamp: number): string {
   const now = Date.now();
   const seconds = Math.floor((now - timestamp) / 1000);

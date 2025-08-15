@@ -37,8 +37,8 @@ const fetchMarketData = async (category?: string) => {
     const params: any = {
         vs_currency: "idr",
         order: "market_cap_desc",
-        per_page: 50,
-        page: 1,
+        per_page: 10,
+        page: 2,
         sparkline: false,
         price_change_percentage: "24h",
     }

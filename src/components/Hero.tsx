@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Shield, Zap, Loader2 } from "lucide-react";
+import { ArrowRight, TrendingUp, Shield, Zap, Loader2, TrendingDown } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ interface CryptoData{
   symbol: string;
   current_price: number;
   market_cap: number;
+  price_change_percentage_24h: number;
 }
 
 const fetchCryptoData = async (): Promise<CryptoData[]> => {
@@ -150,16 +151,26 @@ const Hero = () => {
                       <div className="text-red-500">Gagal memuat data</div>
                     ) : (
                       <>
-                      {cryptoData?.map((crypto) => (
-                        <div key={crypto.id} className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                          <span className="text-muted-foreground">{crypto.symbol.toUpperCase()}/IDR</span>
-                          <span className="text-lg font-bold text-foreground">{formatCurrency(crypto.current_price)}</span>
-                        </div>
-                      ))}
-                    <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
-                      <span className="text-muted-foreground">Kapitalisasi Pasar</span>
-                      <span className="text-lg font-bold text-primary">{formatCurrency(totalMarketCap || 0)}</span>
-                    </div>
+                        {cryptoData?.map((crypto) => (
+                          <div key={crypto.id} className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
+                            <span className="text-muted-foreground">{crypto.symbol.toUpperCase()}/IDR</span>
+                            <div className="flex flex-col items-end">
+                              <span className="text-lg font-bold text-foreground">{formatCurrency(crypto.current_price)}</span>
+                              <div className={`flex items-center text-xs font-semibold ${crypto.price_change_percentage_24h >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                                {crypto.price_change_percentage_24h >= 0 ? (
+                                  <TrendingUp className="w-4 h-4 mr-1" />
+                                ) : (
+                                  <TrendingDown className="w-4 h-4 mr-1 transform rotate-180" />
+                                )}
+                                <span>{Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                          <div className="flex justify-between items-center p-3 bg-accent/50 rounded-lg">
+                            <span className="text-muted-foreground">Kapitalisasi Pasar</span>
+                            <span className="text-lg font-bold text-foreground">{formatCurrency(totalMarketCap || 0)}</span>
+                          </div>
                       </>
                     )}
               </div>
