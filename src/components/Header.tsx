@@ -9,7 +9,7 @@ const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navItems = [
         { name: "Produk", href: "#tools", subItems: [
-            {name: "Konverter Kripto ke Rupiah", href: "/converter"},
+            {name: "Konverter Mata Uang Kripto", href: "/converter"},
             {name: "Kalkulator Ukuran Posisi", href: "/position-size"},
             {name: "Kalkulator Keuntungan dan Kerugian", href: "/gain-loss"},
             {name: "Kalkulator DCA", href: "/roi-mining"}

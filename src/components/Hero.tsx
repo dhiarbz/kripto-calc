@@ -5,6 +5,7 @@ import { ArrowRight, TrendingUp, Shield, Zap, Loader2, TrendingDown } from "luci
 import axios from "axios";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 interface CryptoData{
   id: string;

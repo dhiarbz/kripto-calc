@@ -9,8 +9,8 @@ const ToolsSection = () => {
   const tools = [
     {
       icon: DollarSign,
-      title: "Konverter Kripto ke Rupiah",
-      description: "Konversi mata uang kripto apa pun ke Rupiah Indonesia dengan kurs real-time dan data historis.",
+      title: "Konverter Mata Uang Kripto",
+      description: "Konversi mata uang kripto apa pun dengan kurs real-time dan data historis.",
       features: ["Kurs real-time", "Berbagai jenis koin", "Grafik historis"],
       href: "/converter",
       color: "text-blue-600"
