@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query"; 
 import { isError } from "postcss/lib/css-syntax-error";
-import { parse } from "path";
+
 
 interface CryptoData {
     id: string;

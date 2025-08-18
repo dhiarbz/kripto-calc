@@ -12,7 +12,7 @@ const Header = () => {
             {name: "Konverter Mata Uang Kripto", href: "/converter"},
             {name: "Kalkulator Ukuran Posisi", href: "/position-size"},
             {name: "Kalkulator Keuntungan dan Kerugian", href: "/gain-loss"},
-            {name: "Kalkulator DCA", href: "/roi-mining"}
+            {name: "Kalkulator DCA", href: "/dca-calculator"},
         ] },
         { name: "Pasar", href: "/market" },
         { name: "Kalender", href: "/calendar" },
