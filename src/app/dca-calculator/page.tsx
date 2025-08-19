@@ -1,300 +1,523 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
+
+// Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpDown, Loader2, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { toast } from "sonner";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query"; 
 
-interface cryptoData {
-    id: string;
-    name: string;
-    symbol: string;
-    current_price: number;
-    image: string;
-    price_change_percentage_24h: number;
+// Icons
+import { 
+  DollarSign, Loader2, TrendingUp, TrendingDown, RefreshCw, 
+  CandlestickChart, Target, BarChart3, Calendar 
+} from "lucide-react";
+
+// Types
+interface CryptoData {
+  id: string;
+  name: string;
+  symbol: string;
+  current_price: number;
+  image: string;
+  price_change_percentage_24h: number;
 }
 
 interface DCAResult {
-    totalInvestment: number;
-    profitLoss: number;
-    totalTokens: number;
-    averagePrice: number;
-    currentValue: number;
-    profitLossPercentage: number;
-    purchases: DCAPurchase[];
+  totalInvestment: number;
+  profitLoss: number;
+  totalTokens: number;
+  averagePrice: number;
+  currentValue: number;
+  profitLossPercentage: number;
+  purchases: DCAPurchase[];
+  numberOfPurchases: number;
 }
 
 interface DCAPurchase {
-    date: string;
-    amountInvested: number;
-    tokensPurchased: number;
-    pricePerToken: number;
+  date: string;
+  amountInvested: number;
+  tokensPurchased: number;
+  pricePerToken: number;
 }
 
-const fetchCryptoData = async () => {
-    const {data}= await axios.get(`https://api.coingecko.com/api/v3/coins/markets`, {
-        params: {
-            vs_currency: "idr",
-            order: 'market_cap_desc',
-            per_page: 50,
-            page: 1,
-            sparkline: false,
-            price_change_percentage: "24h"
-        }
-    });
-    return data;
+const fetchCryptoData = async (): Promise<CryptoData[]> => {
+  const { data } = await axios.get(`https://api.coingecko.com/api/v3/coins/markets`, {
+    params: {
+      vs_currency: "idr",
+      order: 'market_cap_desc',
+      per_page: 50,
+      page: 1,
+      sparkline: false,
+      price_change_percentage: "24h"
+    }
+  });
+  return data;
 };
 
 const DCA = () => {
-    const [selectedCrypto, setSelectedCrypto] = useState<string>("bitcoin");
-    const [investmentAmount, setInvestmentAmount] = useState<string>("100000");    
-    const [investmentFrequency, setInvestmentFrequency] = useState<string>("12");
-    const [investmentInterval, setInvestmentInterval] = useState<string>("harian");
-    const [investmentStartDate, setInvestmentStartDate] = useState<string>("");
+  // State
+  const [selectedCrypto, setSelectedCrypto] = useState<string>("bitcoin");
+  const [investmentAmount, setInvestmentAmount] = useState<string>("100000");
+  const [investmentFrequency, setInvestmentFrequency] = useState<string>("12");
+  const [investmentInterval, setInvestmentInterval] = useState<string>("daily");
+  const [investmentStartDate, setInvestmentStartDate] = useState<string>("");
+  const [investmentResult, setInvestmentResult] = useState<DCAResult | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const [investmentResult, setInvestmentResult] = useState<DCAResult | null>(null);
-    const [isLoading, setisLoading] = useState<boolean>(false);
+  // Fetch crypto data
+  const { data: cryptoList, isLoading: isCryptoLoading, error } = useQuery<CryptoData[]>({
+    queryKey: ['cryptoList'],
+    queryFn: fetchCryptoData,
+    staleTime: 1000 * 60 * 5,
+  });
 
-    const { data: cryptoList, isLoading: isCryptoLoading, error } = useQuery<cryptoData[]>({
-        queryKey: ['cryptoList'],
-        queryFn: fetchCryptoData,
-        staleTime: 1000 * 60 * 15, // 5 minutes
+  // Constants
+  const investmentFrequencyOptions = [
+    { value: "daily", label: "Harian", days: 1 },
+    { value: "weekly", label: "Mingguan", days: 7 },
+    { value: "monthly", label: "Bulanan", days: 30 },
+    { value: "yearly", label: "Tahunan", days: 365 }
+  ];
+
+  // Effects
+  useEffect(() => {
+    if (error) {
+      toast.error("Gagal mengambil data cryptocurrency. Silakan coba lagi.");
+    }
+  }, [error]);
+
+  useEffect(() => {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    setInvestmentStartDate(oneYearAgo.toISOString().split("T")[0]);
+  }, []);
+
+  // Memoized values
+  const selectedCryptoData = useMemo(() => {
+    return cryptoList?.find(crypto => crypto.id === selectedCrypto);
+  }, [cryptoList, selectedCrypto]);
+
+  // Handlers
+  const calculateDCA = () => {
+    setIsLoading(true);
+    setInvestmentResult(null);
+
+    const amount = parseFloat(investmentAmount);
+    const months = parseFloat(investmentFrequency);
+
+    if (!selectedCryptoData || isNaN(amount) || isNaN(months) || amount <= 0 || months <= 0) {
+      toast.error("Jumlah investasi dan frekuensi harus berupa angka positif.");
+      setIsLoading(false);
+      return;
+    }
+
+    setTimeout(() => {
+      const purchases: DCAPurchase[] = [];
+      let totalInvestment = 0;
+      let totalTokens = 0;
+
+      const intervalConfig = investmentFrequencyOptions.find(option => option.value === investmentInterval);
+      if (!intervalConfig) {
+        toast.error("Interval investasi tidak valid.");
+        setIsLoading(false);
+        return;
+      }
+
+      const totalDays = months * 30;
+      const purchaseInterval = intervalConfig.days;
+      const currentPrice = selectedCryptoData.current_price;
+      const numberOfPurchases = Math.floor(totalDays / purchaseInterval);
+
+      for (let i = 0; i < numberOfPurchases; i++) {
+        const purchaseDate = new Date(investmentStartDate);
+        purchaseDate.setDate(purchaseDate.getDate() + (i * purchaseInterval));
+
+        const priceVariation = 0.8 + Math.random() * 0.4;
+        const simulatedPrice = currentPrice * priceVariation;
+        const tokensPurchased = amount / simulatedPrice;
+
+        purchases.push({
+          date: purchaseDate.toLocaleDateString("id-ID"),
+          amountInvested: amount,
+          pricePerToken: simulatedPrice,
+          tokensPurchased: tokensPurchased
+        });
+
+        totalInvestment += amount;
+        totalTokens += tokensPurchased;
+      }
+
+      const averagePrice = totalInvestment / totalTokens;
+      const currentValue = totalTokens * currentPrice;
+      const profitLoss = currentValue - totalInvestment;
+      const profitLossPercentage = (profitLoss / totalInvestment) * 100;
+
+      const dcaResult: DCAResult = {
+        totalInvestment,
+        currentValue,
+        profitLoss,
+        totalTokens,
+        averagePrice,
+        numberOfPurchases,
+        profitLossPercentage,
+        purchases: purchases.slice(-5)
+      };
+
+      setInvestmentResult(dcaResult);
+
+      if (profitLoss > 0) {
+        toast.success(`Keuntungan: Rp ${profitLoss.toLocaleString("id-ID")} (${profitLossPercentage.toFixed(2)}%)`);
+      } else if (profitLoss < 0) {
+        toast.error(`Kerugian: Rp ${Math.abs(profitLoss).toLocaleString("id-ID")} (${profitLossPercentage.toFixed(2)}%)`);
+      } else {
+        toast.info("Tidak ada keuntungan atau kerugian.");
+      }
+
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleReset = () => {
+    setSelectedCrypto("bitcoin");
+    setInvestmentAmount("100000");
+    setInvestmentFrequency("12");
+    setInvestmentInterval("daily");
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    setInvestmentStartDate(oneYearAgo.toISOString().split("T")[0]);
+    setInvestmentResult(null);
+    toast.success("Kalkulator telah direset.");
+  };
+
+  // Formatters
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     });
+  };
 
-    useEffect(() => {
-        if (error) {
-            toast.error("Gagal terjadi kesalahan saat mengambil data cryptocurrency. Silakan coba lagi.");
-        }
-    }, [error]);
+  const formatNumber = (value: number, decimals = 6) => {
+    return value.toLocaleString("id-ID", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  };
 
-    useMemo(() => {
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        setInvestmentStartDate(oneYearAgo.toISOString().split("T")[0]);
-    }, []);
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      
+      <main className="pt-20 pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+          
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Kalkulator DCA</h1>
+            <p className="text-muted-foreground text-lg">
+              Hitung strategi Dollar-Cost Averaging untuk investasi cryptocurrency Anda
+            </p>
+          </div>
 
-    const selectedCryptoData = useMemo(() => {
-        return cryptoList?.find(crypto => crypto.id === selectedCrypto);
-    }, [cryptoList, selectedCrypto]);
-
-    const investmentFrequencyOptions = [
-        { value: "daily", label: "Harian", days: 1 },
-        { value: "weekly", label: "Mingguan", days: 7 },
-        { value: "monthly", label: "Bulanan", days: 30 },
-        { value: "Year", label: "Tahunan", days: 365 }
-    ]
-
-    const calculateDCA = () => {
-        setisLoading(true);
-        setInvestmentResult(null);
-
-        const amount = Number.parseFloat(investmentAmount);
-        const months = Number.parseFloat(investmentFrequency);
-
-        if (!selectedCryptoData || Number.isNaN(amount) || Number.isNaN(months) || amount <= 0 || months <= 0) {
-            toast.error("Jumlah investasi dan frekuensi harus berupa angka positif.");
-            setisLoading(false);
-            return;
-        }
-
-        setTimeout(() => {
-            const purchases: DCAPurchase[] = [];
-            let totalInvestment = 0;
-            let totalTokens = 0;
+          {/* Input Form */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CandlestickChart className="h-6 w-6 text-primary" />
+                Pengaturan Investasi
+              </CardTitle>
+              <CardDescription>
+                Masukkan detail investasi Anda untuk menghitung strategi DCA
+              </CardDescription>
+            </CardHeader>
             
-            const intervalDays = investmentFrequencyOptions.find(option => option.value === investmentInterval)!;
-            const totalDays = months * 30;
-            const purchaseInterval = intervalDays.days
-            const current_price = selectedCryptoData.current_price;
-            const numberOfPurchases = Math.floor(totalDays / purchaseInterval);
-
-            for (let i = 0; i < numberOfPurchases; i++) {
-                const purchaseDate = new Date(investmentStartDate);
-                purchaseDate.setDate(purchaseDate.getDate() + (i * purchaseInterval));
-
-                const priceVariation = 0.8 + Math.random() * 0.4; // Simulate price variation between 80% and 120%
-                const simulatedPrice = current_price * priceVariation;
-
-                const tokensPurchased = amount / simulatedPrice;
-
-                purchases.push({
-                    date: purchaseDate.toLocaleDateString("id-ID"),
-                    amountInvested: amount,
-                    pricePerToken: simulatedPrice,
-                    tokensPurchased: tokensPurchased
-                });
-
-                totalInvestment += amount;
-                totalTokens += tokensPurchased;
-            }
-
-            const averagePrice = totalInvestment / totalTokens;
-            const currentValue = totalTokens * current_price;
-            const profitLoss = currentValue - totalInvestment;
-            const profitLossPercentage = (profitLoss / totalInvestment) * 100;
-
-            const dcaResult:DCAResult = {
-                totalInvestment,
-                currentValue,
-                profitLoss,
-                totalTokens,
-                averagePrice,
-                profitLossPercentage,
-                purchases: purchases.slice(-10)
-            }
-            setInvestmentResult(dcaResult);
-            if (profitLoss > 0) {
-                toast.success(`Keuntungan: Rp ${profitLoss.toLocaleString("id-ID")} (${profitLossPercentage.toFixed(2)}%)`);
-            }
-            else if(profitLoss < 0) {
-                toast.error(`Kerugian: Rp ${Math.abs(profitLoss).toLocaleString("id-ID")} (${profitLossPercentage.toFixed(2)}%)`);
-            }
-            else {
-                toast.info("Tidak ada keuntungan atau kerugian.");
-            }
-            
-            setisLoading(false);
-        }, 1000);
-    }
-
-    const handleReset = () => {
-        setSelectedCrypto("bitcoin");
-        setInvestmentAmount("100000");
-        setInvestmentFrequency("12");
-        setInvestmentInterval("harian");
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        setInvestmentStartDate(oneYearAgo.toISOString().split("T")[0]);
-        setInvestmentResult(null);
-        toast.success("Calculator telah direset.");
-    }
-
-    const formatCurrency = (value: number) => {
-        return value.toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        });
-    }
-    const formatPercentage = (value: number, decimals = 6) => {
-        return `${value >=0 ? "+" : ""}${value.toFixed(2)}%`;
-    }
-    const formatNumber = (value: number, decimals = 2) => {
-        return value.toLocaleString("id-ID", {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals
-        });
-    }
-
-    return (
-        <div className="min-h-screen bg-background flex flex-col">
-        <Header/>
-            <main className="pt-20 pb-16">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">                    
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold mb-4">DCA Calculator</h1>
-                    <p className="text-muted-foreground mb-6">Hitung rata-rata biaya dollar (DCA) untuk investasi cryptocurrency Anda.</p>
+            <CardContent className="space-y-6">
+              {/* Crypto Selection */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="crypto-select">Pilih Cryptocurrency</Label>
+                  <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
+                    <SelectTrigger id="crypto-select">
+                      <SelectValue placeholder="Pilih cryptocurrency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cryptoList?.map(crypto => (
+                        <SelectItem key={crypto.id} value={crypto.id}>
+                          <div className="flex items-center gap-2">
+                            <img src={crypto.image} alt={crypto.name} className="w-6 h-6 rounded-full" />
+                            <span className="text-sm font-medium">
+                              {crypto.name} ({crypto.symbol.toUpperCase()})
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {selectedCryptoData && (
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Harga saat ini: {formatCurrency(selectedCryptoData.current_price)}</span>
+                      <div className={`flex items-center gap-1 ${
+                        selectedCryptoData.price_change_percentage_24h >= 0 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}>
+                        {selectedCryptoData.price_change_percentage_24h >= 0 ? (
+                          <TrendingUp className="w-3 h-3" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3" />
+                        )}
+                        <span>{Math.abs(selectedCryptoData.price_change_percentage_24h).toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Pengaturan Investasi</CardTitle>
-                        <CardDescription>Masukkan detail investasi Anda untuk menghitung DCA.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="crypto-select">Cryptocurrency</Label>
-                                <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-                                    <SelectTrigger id="crypto-select">
-                                        <SelectValue placeholder="Pilih Cryptocurrency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {cryptoList?.map(crypto => (
-                                            <SelectItem key={crypto.id} value={crypto.id}>
-                                                {crypto.name} ({crypto.symbol.toUpperCase()})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label htmlFor="investment-amount">Jumlah Investasi (IDR)</Label>
-                                <Input
-                                    id="investment-amount"
-                                    type="number"
-                                    value={investmentAmount}
-                                    onChange={(e) => setInvestmentAmount(e.target.value)}
-                                    placeholder="100000"
-                                />
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="investment-frequency">Frekuensi Investasi (bulan)</Label>
-                                <Input
-                                    id="investment-frequency"
-                                    type="number"
-                                    value={investmentFrequency}
-                                    onChange={(e) => setInvestmentFrequency(e.target.value)}
-                                    placeholder="12"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="investment-interval">Interval Investasi</Label>
-                                <Select value={investmentInterval} onValueChange={setInvestmentInterval}>
-                                    <SelectTrigger id="investment-interval">
-                                        <SelectValue placeholder="Pilih Interval" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {investmentFrequencyOptions.map(option => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
+                {/* Investment Amount */}
+                <div className="space-y-2">
+                  <Label htmlFor="investment-amount">Jumlah Investasi (IDR)</Label>
+                  <Input
+                    id="investment-amount"
+                    type="number"
+                    value={investmentAmount}
+                    onChange={(e) => setInvestmentAmount(e.target.value)}
+                    placeholder="100000"
+                    min="100000"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Minimum: Rp 100.000 per investasi
+                  </p>
+                </div>
+              </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="investment-start-date">Tanggal Mulai Investasi</Label>
-                                <Input
-                                    id="investment-start-date"
-                                    type="date"
-                                    value={investmentStartDate}
-                                    onChange={(e) => setInvestmentStartDate(e.target.value)}
-                                    min="2020-01-01"
-                                    max={new Date().toISOString().split("T")[0]}
-                                />
-                            </div>
-                            <div className="flex items-center justify-end">
-                                <Button variant="outline" onClick={handleReset} className="mr-2">
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    Reset
-                                </Button>
-                                <Button onClick={calculateDCA} disabled={isLoading}>
-                                    {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                                    Hitung DCA
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-            </main>
-        <Footer/>
+              {/* Frequency and Interval */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="investment-frequency">Durasi Investasi (bulan)</Label>
+                  <Input
+                    id="investment-frequency"
+                    type="number"
+                    value={investmentFrequency}
+                    onChange={(e) => setInvestmentFrequency(e.target.value)}
+                    placeholder="12"
+                    min="1"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="investment-interval">Interval Investasi</Label>
+                  <Select value={investmentInterval} onValueChange={setInvestmentInterval}>
+                    <SelectTrigger id="investment-interval">
+                      <SelectValue placeholder="Pilih interval" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {investmentFrequencyOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Date and Actions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="investment-start-date">Tanggal Mulai Investasi</Label>
+                  <Input
+                    id="investment-start-date"
+                    type="date"
+                    value={investmentStartDate}
+                    onChange={(e) => setInvestmentStartDate(e.target.value)}
+                    min="2020-01-01"
+                    max={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+
+                <div className="flex items-end justify-end gap-2">
+                  <Button variant="outline" onClick={handleReset} className="flex-1 sm:flex-none">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reset
+                  </Button>
+                  <Button 
+                    onClick={calculateDCA} 
+                    disabled={isLoading || isCryptoLoading}
+                    className="flex-1 sm:flex-none"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    ) : (
+                      <TrendingUp className="mr-2 h-4 w-4" />
+                    )}
+                    Hitung DCA
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Results Section */}
+          {investmentResult && (
+            <>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <SummaryCard
+                  title="Total Investasi"
+                  value={formatCurrency(investmentResult.totalInvestment)}
+                  subtitle={`${investmentResult.numberOfPurchases} kali pembelian`}
+                  icon={DollarSign}
+                  iconColor="text-blue-600"
+                  bgColor="bg-blue-50"
+                  borderColor="border-blue-200"
+                />
+
+                <SummaryCard
+                  title="Total Token"
+                  value={formatNumber(investmentResult.totalTokens)}
+                  subtitle={selectedCryptoData?.symbol.toUpperCase() || ''}
+                  icon={Target}
+                  iconColor="text-purple-600"
+                  bgColor="bg-purple-50"
+                  borderColor="border-purple-200"
+                />
+
+                <SummaryCard
+                  title="Harga Rata-rata"
+                  value={formatCurrency(investmentResult.averagePrice)}
+                  subtitle={`per ${selectedCryptoData?.symbol.toUpperCase()}`}
+                  icon={BarChart3}
+                  iconColor="text-orange-600"
+                  bgColor="bg-orange-50"
+                  borderColor="border-orange-200"
+                />
+
+                <SummaryCard
+                  title={investmentResult.profitLoss >= 0 ? 'Keuntungan' : 'Kerugian'}
+                  value={formatCurrency(Math.abs(investmentResult.profitLoss))}
+                  subtitle={`${investmentResult.profitLoss >= 0 ? '+' : '-'}${Math.abs(investmentResult.profitLossPercentage).toFixed(2)}%`}
+                  icon={investmentResult.profitLoss >= 0 ? TrendingUp : TrendingDown}
+                  iconColor={investmentResult.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}
+                  bgColor={investmentResult.profitLoss >= 0 ? 'bg-green-50' : 'bg-red-50'}
+                  borderColor={investmentResult.profitLoss >= 0 ? 'border-green-200' : 'border-red-200'}
+                />
+              </div>
+
+              {/* Current Value Card */}
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    Nilai Investasi Saat Ini
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-4">
+                    <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 break-all">
+                      {formatCurrency(investmentResult.currentValue)}
+                    </div>
+                    <div className={`text-base md:text-lg ${investmentResult.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {investmentResult.profitLoss >= 0 ? 'Keuntungan' : 'Kerugian'}: {formatCurrency(Math.abs(investmentResult.profitLoss))}
+                      ({investmentResult.profitLoss >= 0 ? '+' : '-'}{Math.abs(investmentResult.profitLossPercentage).toFixed(2)}%)
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Purchases Table */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    Riwayat Pembelian Terakhir
+                  </CardTitle>
+                  <CardDescription>
+                    5 transaksi DCA terakhir dari simulasi
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 font-medium">Tanggal</th>
+                          <th className="text-right py-3 font-medium">Investasi</th>
+                          <th className="text-right py-3 font-medium">Harga per Token</th>
+                          <th className="text-right py-3 font-medium">Token Dibeli</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {investmentResult.purchases.map((purchase, index) => (
+                          <tr key={index} className="border-b hover:bg-muted/50">
+                            <td className="py-3 text-xs md:text-sm">{purchase.date}</td>
+                            <td className="text-right py-3 text-xs md:text-sm">{formatCurrency(purchase.amountInvested)}</td>
+                            <td className="text-right py-3 text-xs md:text-sm">{formatCurrency(purchase.pricePerToken)}</td>
+                            <td className="text-right py-3 text-xs md:text-sm">{formatNumber(purchase.tokensPurchased)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
-    )
-}
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+// Helper Component for Summary Cards
+const SummaryCard = ({ 
+  title, 
+  value, 
+  subtitle, 
+  icon: Icon, 
+  iconColor, 
+  bgColor, 
+  borderColor,
+  isLargeNumber = false,
+  isSmallNumber = false
+}: {
+  title: string;
+  value: string;
+  subtitle: string;
+  icon: React.ComponentType<any>;
+  iconColor: string;
+  bgColor: string;
+  borderColor: string;
+  isLargeNumber?: boolean;
+  isSmallNumber?: boolean;
+}) => (
+ <Card className={`${borderColor} ${bgColor}`}>
+    <CardContent className="p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+        <span className="text-sm font-medium">{title}</span>
+      </div>
+      <div className={`font-bold mb-1 break-all ${
+        isLargeNumber ? 'text-xl' : 
+        isSmallNumber ? 'text-sm' : 
+        'text-sm'
+      }`}>
+        {value}
+      </div>
+      <div className="text-xs opacity-75">{subtitle}</div>
+    </CardContent>
+  </Card>
+);
+
 export default DCA;
