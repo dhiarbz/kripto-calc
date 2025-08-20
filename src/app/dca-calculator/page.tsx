@@ -433,43 +433,6 @@ const DCA = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Recent Purchases Table */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    Riwayat Pembelian Terakhir
-                  </CardTitle>
-                  <CardDescription>
-                    5 transaksi DCA terakhir dari simulasi
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 font-medium">Tanggal</th>
-                          <th className="text-right py-3 font-medium">Investasi</th>
-                          <th className="text-right py-3 font-medium">Harga per Token</th>
-                          <th className="text-right py-3 font-medium">Token Dibeli</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {investmentResult.purchases.map((purchase, index) => (
-                          <tr key={index} className="border-b hover:bg-muted/50">
-                            <td className="py-3 text-xs md:text-sm">{purchase.date}</td>
-                            <td className="text-right py-3 text-xs md:text-sm">{formatCurrency(purchase.amountInvested)}</td>
-                            <td className="text-right py-3 text-xs md:text-sm">{formatCurrency(purchase.pricePerToken)}</td>
-                            <td className="text-right py-3 text-xs md:text-sm">{formatNumber(purchase.tokensPurchased)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
             </>
           )}
         </div>
