@@ -2,21 +2,17 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Filter, TrendingUp, AlertTriangle, RefreshCw, Search, BarChart3, Zap, Globe, TrendingDown, Currency } from "lucide-react";
-import { isError } from "postcss/lib/css-syntax-error";
+import { Calendar, Clock, Filter, TrendingUp, AlertTriangle, RefreshCw, Search, BarChart3, Zap, Globe, TrendingDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 
 
 interface EconomicEvent {
@@ -165,15 +161,15 @@ const EconomicCalendarPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
         < Header/>
-        <main className="pt-20 pb-16 flex-grow">
+        <main className="pt-20 pb-16 flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold text-foreground mb-4">Kalender Ekonomi</h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                     Kondisi Makro ekonomi global sangat berpengaruh pada pergerakan pasar. Gunakan Kalender Ekonomi untuk memantau berita penting dan data ekonomi secara real time.Selalu siap, tak pernah tertinggal.
                 </p>
             </div>
-            <Card>
-
+           
+            <Card className="mb-8">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
               <CardTitle className="flex items-center gap-2 text-slate-800">
                 <Filter className="w-6 h-6 text-blue-600" />
@@ -181,6 +177,7 @@ const EconomicCalendarPage = () => {
               </CardTitle>
               <CardDescription>Sesuaikan tampilan kalender ekonomi sesuai kebutuhan Anda</CardDescription>
             </CardHeader>
+
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 {/* Country Filter */}
@@ -188,7 +185,7 @@ const EconomicCalendarPage = () => {
                   <Label>Negara</Label>
                   <Select value={filters.country} onValueChange={(value) => handleFilterChange("country", value)}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Pilih Negara" />
                     </SelectTrigger>
                     <SelectContent>
                       {COUNTRIES.map((country) => (
@@ -208,7 +205,7 @@ const EconomicCalendarPage = () => {
                   <Label>Mata Uang</Label>
                   <Select value={filters.currency} onValueChange={(value) => handleFilterChange("currency", value)}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Pilih Mata Uang" />
                     </SelectTrigger>
                     <SelectContent>
                       {CURRENCIES.map((currency) => (
@@ -222,10 +219,10 @@ const EconomicCalendarPage = () => {
 
                 {/* Importance Filter */}
                 <div className="space-y-2">
-                  <Label>Tingkat Dampak</Label>
+                  <Label>Tingkat Pengaruh</Label>
                   <Select value={filters.importance} onValueChange={(value) => handleFilterChange("importance", value)}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Pilih Pengaruh" />
                     </SelectTrigger>
                     <SelectContent>
                       {IMPORTANCE_LEVELS.map((level) => (
@@ -245,7 +242,7 @@ const EconomicCalendarPage = () => {
                   <Label>Tanggal</Label>
                   <Input
                     type="date"
-                    value={format(selectedDate, "dd-MM-yyyy")}
+                    value={format(selectedDate, "yyyy-MM-dd")}
                     onChange={handleDateChange}
                     className="w-full"
                   />
