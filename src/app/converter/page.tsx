@@ -12,6 +12,39 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query"; 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Konverter Mata Uang Kripto - CryptoCalc",
+  description: "Konverter Mata Uang Kripto gratis yang memungkinkan Anda mengonversi antara berbagai mata uang kripto dan fiat dengan data harga real-time.",
+  keywords: ["konverter kripto", "konverter mata uang", "crypto to fiat", "crypto converter", "cryptocurrency converter", "kripto ke rupiah", "crypto to IDR"],
+  authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
+  openGraph: {
+    title: "Konverter Mata Uang Kripto -CryptoCalc",
+    description: "Konverter Mata Uang Kripto gratis yang memungkinkan Anda mengonversi antara berbagai mata uang kripto dan fiat dengan data harga real-time.",
+    url: "https://kripto-calc.vercel.app/converter",
+    siteName: "Kripto Calc",
+    images: [
+      {
+        url: "https://kripto-calc.vercel.app/assets/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Konverter Mata Uang Kripto - CryptoCalc",
+      }
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  robots : {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    }
+  }
+  
+}
 
 // Tipe data tetap sama
 interface CurrencyData {

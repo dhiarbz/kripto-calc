@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { Metadata } from "next";
 
 // Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +49,36 @@ interface DCAPurchase {
   pricePerToken: number;
 }
 
+export const metadata: Metadata = {
+  title: "Kripto Calc - Kalkulator DCA (Dollar-Cost Averaging) Gratis",
+  description: "Hitung strategi Dollar-Cost Averaging (DCA) untuk investasi cryptocurrency Anda dengan Kalkulator DCA gratis dari Kripto Calc.",
+  keywords: ["kalkulator dca", "dollar-cost averaging", "strategi investasi crypto", "investasi berkala crypto", "kalkulator investasi crypto", "crypto trading tools"],
+  authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
+  openGraph: {
+    title: "Kripto Calc - Kalkulator DCA (Dollar-Cost Averaging) Gratis",
+    description: "Hitung strategi Dollar-Cost Averaging (DCA) untuk investasi cryptocurrency Anda dengan Kalkulator DCA gratis dari Kripto Calc.",
+    url: "https://kripto-calc.vercel.app/dca-calculator",
+    siteName: "Kripto Calc",
+    images: [
+      {
+        url: "https://kripto-calc.vercel.app/assets/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Kripto Calc - Kalkulator DCA (Dollar-Cost Averaging) Gratis",
+      }
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow:true,
+    googleBot: {
+      index:true,
+      follow:true,
+    }
+  }
+}
 const fetchCryptoData = async (): Promise<CryptoData[]> => {
   const { data } = await axios.get(`https://api.coingecko.com/api/v3/coins/markets`, {
     params: {
