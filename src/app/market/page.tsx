@@ -11,39 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image"; 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Metadata } from "next";
 
-export const metadata: Metadata = {
-    title: "Kripto Calc - Harga Pasar Kripto Real-time",
-    description: "Pantau harga pasar kripto real-time dalam Rupiah dengan data dari CoinGecko. Lihat pergerakan harga, kapitalisasi pasar, dan volume perdagangan 24 jam.",
-    keywords: ["harga kripto", "pasar kripto", "data pasar crypto", "harga bitcoin", "harga ethereum", "coinmarketcap alternatif", "coingecko data", "harga crypto real-time"],
-    authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
-    openGraph: {
-        title: "Kripto Calc - Harga Pasar Kripto Real-time",
-        description: "Pantau harga pasar kripto real-time dalam Rupiah dengan data dari CoinGecko. Lihat pergerakan harga, kapitalisasi pasar, dan volume perdagangan 24 jam.",
-        url: "https://kripto-calc.vercel.app/market",
-        siteName: "Kripto Calc",
-        images: [
-            {
-                url: "https://kripto-calc.vercel.app/assets/og-image.png",
-                width: 1200,
-                height: 630,
-                alt: "Kripto Calc - Harga Pasar Kripto Real-time",
-            }
-        ],
-        locale: "id_ID",
-        type: "website",
-    },
-    robots: {
-        index:true,
-        follow:true,
-        googleBot: {
-            index:true,
-            follow:true,
-        }
-    }
-
-}
 interface MarketData {
     id: string;
     symbol: string;

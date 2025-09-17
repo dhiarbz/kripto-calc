@@ -13,39 +13,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { format, isToday, parseISO } from "date-fns";
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: "Kalender Ekonomi - Pantau Event Ekonomi Global Real-Time | Kripto Calc",
-  description: "Pantau event ekonomi global secara real-time dengan Kalender Ekonomi Kripto Calc. Dapatkan informasi penting yang memengaruhi pasar keuangan dan kripto.",
-  keywords: ["kalender ekonomi", "event ekonomi", "data ekonomi real-time", "trading crypto", "manajemen risiko", "analisis pasar", "crypto trading tools"],
-  authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
-  openGraph: {
-    title: "Kalender Ekonomi - Pantau Event Ekonomi Global Real-Time | Kripto Calc",
-    description: "Pantau event ekonomi global secara real-time dengan Kalender Ekonomi Kripto Calc. Dapatkan informasi penting yang memengaruhi pasar keuangan dan kripto.",
-    url: "https://kripto-calc.vercel.app/calendar",
-    siteName: "Kripto Calc",
-    images: [
-      {
-        url: "https://kripto-calc.vercel.app/assets/og-image-calendar.png",
-        width: 1200,
-        height: 630,
-        alt: "Kalender Ekonomi - Pantau Event Ekonomi Global Real-Time | Kripto Calc",
-      }
-    ],
-    locale: "id_ID",
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index:true,
-      follow:true,
-    }
-  }
-  
-}
 
 interface EconomicEvent {
     CalendarId: string;

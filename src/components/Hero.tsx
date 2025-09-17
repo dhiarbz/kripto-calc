@@ -6,43 +6,6 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Kripto Calc - Kalkulator Trading Crypto Gratis",
-  description: "Kripto Calc adalah kalkulator trading crypto gratis yang membantu Anda menghitung posisi ideal, analisis risiko pasar, dan potensi ROI.",
-  keywords: ["kalkulator crypto", "trading crypto", "manajemen risiko", "ROI crypto", "analisis pasar crypto", "crypto trading tools", "kalkulator investasi crypto"],
-  authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
-
-  openGraph: {
-    title: "Kripto Calc - Kalkulator Trading Crypto Gratis",
-    description: "Kripto Calc adalah kalkulator trading crypto gratis yang membantu Anda menghitung posisi ideal, analisis risiko pasar, dan potensi ROI.",
-    url: "https://kripto-calc.vercel.app",
-    siteName: "Kripto Calc",
-    images: [
-      {
-        url: "https://kripto-calc.vercel.app/assets/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Kripto Calc - Kalkulator Trading Crypto Gratis",  
-      }
-    ],
-    locale: "id_ID",
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
-  },
-
-  alternates: {
-    canonical: "https://kripto-calc.vercel.app",
-  }
-}
 
 interface CryptoData{
   id: string;

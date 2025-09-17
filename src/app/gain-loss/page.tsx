@@ -14,39 +14,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query"; 
 import { isError } from "postcss/lib/css-syntax-error";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Kalkulator Keuntungan dan Kerugian Crypto - CryptoCalc",
-    description: "Hitung potensi keuntungan dan kerugian trading crypto Anda dengan Kalkulator Keuntungan dan Kerugian Crypto kami. Rencanakan strategi trading yang lebih baik hari ini!",
-    keywords: ["kalkulator keuntungan kerugian crypto", "kalkulator trading crypto", "perhitungan risiko crypto", "strategi trading crypto", "crypto trading tools", "manajemen risiko crypto"],
-    authors: [{ name: "Kripto Calc", url: "https://kripto-calc.vercel.app" }],
-    openGraph: {
-        title: "Kalkulator Keuntungan dan Kerugian Crypto - CryptoCalc",
-        description: "Hitung potensi keuntungan dan kerugian trading crypto Anda dengan Kalkulator Keuntungan dan Kerugian Crypto kami. Rencanakan strategi trading yang lebih baik hari ini!",
-        url: "https://kripto-calc.vercel.app/gain-loss",
-        siteName: "Kripto Calc",
-        images: [
-            {
-                url: "https://kripto-calc.vercel.app/assets/og-image.png",
-                width: 1200,    
-                height: 630,
-                alt: "Kalkulator Keuntungan dan Kerugian Crypto - CryptoCalc",
-            }
-        ],
-        locale: "id_ID",
-        type: "website",
-    },
-    robots: {
-        index:true,
-        follow:true,
-        googleBot: {
-            index:true,
-            follow:true,
-        }
-    }
-}
-
 
 interface CryptoData {
     id: string;
