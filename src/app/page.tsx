@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Market from "@/components/Market";
 import ToolsSection from "@/components/Tools";
+import ChatInterface from "@/components/chat-interface";
 import Footer from "@/components/Footer";
 
 export const metadata = {
@@ -40,6 +41,7 @@ export default function Page() {
       <Hero />
       <Market />
       <ToolsSection />
+      <ChatInterface />
       <Footer />
     </div>
   );
